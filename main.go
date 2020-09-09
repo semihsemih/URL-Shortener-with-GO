@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	controller "short-links/controller"
 )
 
 func main() {
 	mux := defaultMux()
 	pathToUrls := make(map[string]string)
-	mapHandler := mapController(pathToUrls, mux)
+	mapController := controller.MapController(pathToUrls, mux)
 
 	yaml := `
 - path: /go-terminal-ui2
@@ -16,13 +18,13 @@ func main() {
 - path: /blackjack
   url: https://github.com/semihsemih/Blackjack-Vue
 `
-	yamlHandler, err := yamlController([]byte(yaml), mapHandler)
+	yamlController, err := controller.YAMLController([]byte(yaml), mapController)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Server start on :9000")
-	http.ListenAndServe(":9000", yamlHandler)
+	http.ListenAndServe(":9000", yamlController)
 }
 
 func defaultMux() *http.ServeMux {
@@ -32,5 +34,5 @@ func defaultMux() *http.ServeMux {
 }
 
 func mainPageHandler(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintf(writer, "You can use the URL shortener as '...... / path'.")
+	fmt.Fprintf(writer, "You can use the URL shortener as '....../path'.")
 }

@@ -1,16 +1,17 @@
-package main
+package controller
 
 import (
-	"gopkg.in/yaml.v2"
 	"net/http"
+
+	"gopkg.in/yaml.v2"
 )
 
-type pathUrl struct {
+type pathURL struct {
 	Path string `yaml:"path"`
 	URL  string `yaml:"url"`
 }
 
-func mapController(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
+func MapController(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		path := request.URL.Path
 		if dest, ok := pathsToUrls[path]; ok {
@@ -21,8 +22,8 @@ func mapController(pathsToUrls map[string]string, fallback http.Handler) http.Ha
 	}
 }
 
-func yamlController(yamlBytes []byte, fallback http.Handler) (http.HandlerFunc, error) {
-	var pathUrls []pathUrl
+func YAMLController(yamlBytes []byte, fallback http.Handler) (http.HandlerFunc, error) {
+	var pathUrls []pathURL
 	err := yaml.Unmarshal(yamlBytes, &pathUrls)
 	if err != nil {
 		return nil, err
@@ -33,5 +34,5 @@ func yamlController(yamlBytes []byte, fallback http.Handler) (http.HandlerFunc, 
 		pathsToUrls[pu.Path] = pu.URL
 	}
 
-	return mapController(pathsToUrls, fallback), nil
+	return MapController(pathsToUrls, fallback), nil
 }
