@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 
@@ -8,17 +9,16 @@ import (
 )
 
 func main() {
+	yamlFileName := flag.String("yaml", "urls.yaml", "a yaml file in the format of 'path,url'")
+	flag.Parse()
+
 	mux := defaultMux()
 	pathToUrls := make(map[string]string)
 	mapController := controller.MapController(pathToUrls, mux)
 
-	yaml := `
-- path: /go-terminal-ui2
-  url: https://github.com/semihsemih/go-terminal-ui
-- path: /blackjack
-  url: https://github.com/semihsemih/Blackjack-Vue
-`
-	yamlController, err := controller.YAMLController([]byte(yaml), mapController)
+	yamlFileContent := controller.GetYAMLFileContent(*yamlFileName)
+
+	yamlController, err := controller.YAMLController([]byte(yamlFileContent), mapController)
 	if err != nil {
 		panic(err)
 	}
